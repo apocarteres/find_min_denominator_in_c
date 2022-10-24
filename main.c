@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 
 typedef struct {
     int a;
@@ -56,31 +57,47 @@ char is_prime(int n) {
     return 1;
 }
 
-size_t count_dividers(const int n) {
-    size_t count = 0;
+void for_each_divider(const int n, void (*fn)(const int *, void **), int args_len, ...) {
+    va_list arguments;
+    va_start(arguments, args_len);
+    void *fn_args[args_len];
+    for (int i = 0; i < args_len; ++i) {
+        fn_args[i] = va_arg (arguments, void*);
+    }
+    va_end (arguments);
     for (int i = 2; i <= n; ++i) {
         if (!is_prime(i)) {
             continue;
         }
         if (n % i == 0) {
-            ++count;
+            fn(&i, fn_args);
         }
     }
+}
+
+void count_dividers_fn(const int *_, void **args) {
+    size_t *result = (size_t *) *(args + 0);
+    (*result)++;
+}
+
+size_t count_dividers(const int n) {
+    size_t count = 0;
+    for_each_divider(n, count_dividers_fn, 1, &count);
     return count;
 }
 
+void find_dividers_fn(const int *n, void **args) {
+    int *result = (int *) *(args + 0);
+    size_t *result_length = (size_t *) *(args + 1);
+    size_t *counter = (size_t *) *(args + 2);
+    assert(*counter <= *result_length);
+    *(result + *counter) = *n;
+    (*counter)++;
+}
+
 void find_dividers(const int n, int *result, size_t result_length) {
-    for (int i = 2; i <= n; ++i) {
-        if (!is_prime(i)) {
-            continue;
-        }
-        if (n % i == 0) {
-            assert(result_length >= 0);
-            *result = i;
-            ++result;
-            --result_length;
-        }
-    }
+    size_t counter = 0;
+    for_each_divider(n, find_dividers_fn, 3, result, &result_length, &counter);
 }
 
 void handle_find_div(const fraction *f1, const fraction *f2) {
