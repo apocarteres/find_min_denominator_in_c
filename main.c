@@ -42,21 +42,6 @@ void print_result(const fraction *f1, const fraction *f2) {
     print_fraction_n(f2);
 }
 
-void handle_mutual_dividable(const fraction *f1, const fraction *f2) {
-    int d = f1->b / f2->b;
-    fraction f2_d = multiply(f2, d);
-    print_result(f1, &f2_d);
-}
-
-char is_prime(int n) {
-    for (int i = 2; i < n; ++i) {
-        if (n % i == 0) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
 void for_each_divider(const int n, void (*fn)(const int *, void **), int args_len, ...) {
     va_list arguments;
     va_start(arguments, args_len);
@@ -66,9 +51,6 @@ void for_each_divider(const int n, void (*fn)(const int *, void **), int args_le
     }
     va_end (arguments);
     for (int i = 2; i <= n; ++i) {
-        if (!is_prime(i)) {
-            continue;
-        }
         if (n % i == 0) {
             fn(&i, fn_args);
         }
@@ -100,6 +82,21 @@ void find_dividers(const int n, int *result, size_t result_length) {
     for_each_divider(n, find_dividers_fn, 3, result, &result_length, &counter);
 }
 
+int find_max_common_div(int *f1_divs, const size_t f1_div_count, int *f2_divs, const size_t f2_div_count) {
+    int *f1_p = f1_divs + f1_div_count - 1;
+    for (size_t i = 0; i < f1_div_count; ++i) {
+        int *f2_p = f2_divs + f2_div_count - 1;
+        for (size_t j = 0; j < f2_div_count; ++j) {
+            if (*f1_p == *f2_p) {
+                return *f1_p;
+            }
+            --f2_p;
+        }
+        --f1_p;
+    }
+    return -1;
+}
+
 void handle_find_div(const fraction *f1, const fraction *f2) {
     const size_t f1_div_count = count_dividers(f1->b);
     const size_t f2_div_count = count_dividers(f2->b);
@@ -109,8 +106,20 @@ void handle_find_div(const fraction *f1, const fraction *f2) {
     find_dividers(f2->b, f2_divs, f2_div_count);
     print_div("f1 dividers", f1_div_count, f1_divs);
     print_div("f2 dividers", f2_div_count, f2_divs);
-    int f1_m = f2_divs[f2_div_count - 1];
-    int f2_m = f1->b * f1_m / f2->b;
+    int f1_m;
+    int f2_m;
+    int max_d = find_max_common_div(f1_divs, f1_div_count, f2_divs, f2_div_count);
+    if (max_d == -1) {
+        f1_m = f2->b;
+        f2_m = f1->b;
+        printf("no common denominator, let's just mutually multiply\n");
+    } else {
+        int common_d = (f1->b * f2->b) / max_d;
+        f1_m = common_d / f1->b;
+        f2_m = common_d / f2->b;
+        printf("max common divider is: %d\n", max_d);
+        printf("min common denominator is: %d\n", common_d);
+    }
     fraction f1_d = multiply(f1, f1_m);
     fraction f2_d = multiply(f2, f2_m);
     print_result(&f1_d, &f2_d);
@@ -147,14 +156,6 @@ int main(int argc, char **argv) {
     printf("second fraction: %d/%d\n", f2.a, f2.b);
     if (f1.b == f2.b) {
         print_result(&f1, &f2);
-        return 0;
-    }
-    if (f1.b % f2.b == 0) {
-        handle_mutual_dividable(&f1, &f2);
-        return 0;
-    }
-    if (f2.b % f1.b == 0) {
-        handle_mutual_dividable(&f2, &f1);
         return 0;
     }
     if (f1.b < f2.b) {
