@@ -97,7 +97,7 @@ int find_max_common_div(int *f1_divs, const size_t f1_div_count, int *f2_divs, c
     return -1;
 }
 
-void handle_find_div(const fraction *f1, const fraction *f2) {
+void solve(const fraction *f1, const fraction *f2) {
     const size_t f1_div_count = count_dividers(f1->b);
     const size_t f2_div_count = count_dividers(f2->b);
     int f1_divs[f1_div_count];
@@ -120,8 +120,10 @@ void handle_find_div(const fraction *f1, const fraction *f2) {
         printf("max common divider is: %d\n", max_d);
         printf("min common denominator is: %d\n", common_d);
     }
-    fraction f1_d = multiply(f1, f1_m);
-    fraction f2_d = multiply(f2, f2_m);
+    const fraction f1_d = multiply(f1, f1_m);
+    const fraction f2_d = multiply(f2, f2_m);
+    printf("%d/%d * %d = %d/%d and %d/%d * %d = %d/%d\n",
+           f1->a, f1->b, f1_m, f1_d.a, f1_d.b, f2->a, f2->b, f2_m, f2_d.a, f2_d.b);
     print_result(&f1_d, &f2_d);
 }
 
@@ -154,17 +156,6 @@ int main(int argc, char **argv) {
     fraction f2 = parse_fraction(second_arg);
     printf("first fraction: %d/%d\n", f1.a, f1.b);
     printf("second fraction: %d/%d\n", f2.a, f2.b);
-    if (f1.b == f2.b) {
-        print_result(&f1, &f2);
-        return 0;
-    }
-    if (f1.b < f2.b) {
-        handle_find_div(&f1, &f2);
-        return 0;
-    }
-    if (f1.b > f2.b) {
-        handle_find_div(&f2, &f1);
-        return 0;
-    }
+    solve(&f1, &f2);
     return 0;
 }
