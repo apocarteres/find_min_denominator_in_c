@@ -9,10 +9,10 @@ typedef struct {
     int b;
 } fraction;
 
-void print_div(const char *text, const size_t count, const int *primes) {
+void print_dividers(const char *text, const size_t count, const int *divs) {
     printf("%s: ", text);
     for (int i = 0; i < count; ++i) {
-        printf("%d", primes[i]);
+        printf("%d", divs[i]);
         if (i == count - 1) {
             printf(" ");
         } else {
@@ -88,20 +88,20 @@ void solve(const fraction *f1, const fraction *f2) {
     int f2_divs[f2_div_count];
     find_dividers(f1->b, f1_divs, f1_div_count);
     find_dividers(f2->b, f2_divs, f2_div_count);
-    print_div("f1 dividers", f1_div_count, f1_divs);
-    print_div("f2 dividers", f2_div_count, f2_divs);
+    print_dividers("f1 dividers", f1_div_count, f1_divs);
+    print_dividers("f2 dividers", f2_div_count, f2_divs);
     int f1_m;
     int f2_m;
-    int max_d = find_max_common_div(f1_divs, f1_div_count, f2_divs, f2_div_count);
-    if (max_d == -1) {
+    int mcd = find_max_common_div(f1_divs, f1_div_count, f2_divs, f2_div_count);
+    if (mcd == -1) {
         f1_m = f2->b;
         f2_m = f1->b;
         printf("no common denominator, let's just mutually multiply\n");
     } else {
-        int common_d = (f1->b * f2->b) / max_d;
+        int common_d = (f1->b * f2->b) / mcd;
         f1_m = common_d / f1->b;
         f2_m = common_d / f2->b;
-        printf("max common divider is: %d\n", max_d);
+        printf("max common divider is: %d\n", mcd);
         printf("min common denominator is: %d\n", common_d);
     }
     const fraction f1_d = multiply(f1, f1_m);
