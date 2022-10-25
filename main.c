@@ -22,24 +22,8 @@ void print_div(const char *text, const size_t count, const int *primes) {
     printf("\n");
 }
 
-void print_fraction(const fraction *f) {
-    printf("%d/%d", f->a, f->b);
-}
-
-void print_fraction_n(const fraction *f) {
-    print_fraction(f);
-    printf("\n");
-}
-
 fraction multiply(const fraction *f, const int m) {
     return (fraction) {.a = f->a * m, .b = f->b * m};
-}
-
-void print_result(const fraction *f1, const fraction *f2) {
-    printf("result: ");
-    print_fraction(f1);
-    printf(", ");
-    print_fraction_n(f2);
 }
 
 void for_each_divider(const int n, void (*fn)(const int *, void **), int args_len, ...) {
@@ -122,9 +106,8 @@ void solve(const fraction *f1, const fraction *f2) {
     }
     const fraction f1_d = multiply(f1, f1_m);
     const fraction f2_d = multiply(f2, f2_m);
-    printf("%d/%d * %d = %d/%d and %d/%d * %d = %d/%d\n",
-           f1->a, f1->b, f1_m, f1_d.a, f1_d.b, f2->a, f2->b, f2_m, f2_d.a, f2_d.b);
-    print_result(&f1_d, &f2_d);
+    printf("%d/%d * %d = %d/%d\n", f1->a, f1->b, f1_m, f1_d.a, f1_d.b);
+    printf("%d/%d * %d = %d/%d\n", f2->a, f2->b, f2_m, f2_d.a, f2_d.b);
 }
 
 fraction parse_fraction(const char *str) {
@@ -154,8 +137,8 @@ int main(int argc, char **argv) {
     char *second_arg = *(++argv);
     fraction f1 = parse_fraction(first_arg);
     fraction f2 = parse_fraction(second_arg);
-    printf("first fraction: %d/%d\n", f1.a, f1.b);
-    printf("second fraction: %d/%d\n", f2.a, f2.b);
+    printf("f1: %d/%d\n", f1.a, f1.b);
+    printf("f2: %d/%d\n", f2.a, f2.b);
     solve(&f1, &f2);
     return 0;
 }
