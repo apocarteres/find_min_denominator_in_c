@@ -68,17 +68,24 @@ void find_dividers(const int n, int *result, size_t result_length) {
 
 int find_max_common_div(int *f1_divs, const size_t f1_div_count, int *f2_divs, const size_t f2_div_count) {
     int *f1_p = f1_divs + f1_div_count - 1;
-    for (size_t i = 0; i < f1_div_count; ++i) {
-        int *f2_p = f2_divs + f2_div_count - 1;
-        for (size_t j = 0; j < f2_div_count; ++j) {
-            if (*f1_p == *f2_p) {
-                return *f1_p;
+    int *f2_p = f2_divs + f2_div_count - 1;
+    while (1) {
+        if (*f1_p == *f2_p) {
+            return *f1_p;
+        }
+        if (*f1_p > *f2_p) {
+            if (f1_p == f1_divs) {
+                return -1;
+            }
+            --f1_p;
+        }
+        if (*f2_p > *f1_p) {
+            if (f2_p == f2_divs) {
+                return -1;
             }
             --f2_p;
         }
-        --f1_p;
     }
-    return -1;
 }
 
 void solve(const fraction *f1, const fraction *f2) {
