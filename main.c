@@ -139,7 +139,24 @@ fraction parse_fraction(const char *str) {
     return (fraction) {.a = a, .b = b};
 }
 
+void print_help(const char *file_name) {
+    char *last_slash = (char *) file_name;
+    char *p = (char *) file_name;
+    while (*p != '\0') {
+        if (*p == '\\' || *p == '/') {
+            last_slash = p;
+        }
+        ++p;
+    }
+    printf("usage: .%s <first fraction> <second fraction>\n", last_slash);
+    printf("for example: .%s 1/3 1/5\n", last_slash);
+}
+
 int main(int argc, char **argv) {
+    if (argc != 3) {
+        print_help(*argv);
+        exit(1);
+    }
     char *first_arg = *(++argv);
     char *second_arg = *(++argv);
     fraction f1 = parse_fraction(first_arg);
